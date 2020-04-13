@@ -6,6 +6,7 @@ import Options from './Options'
 class Card extends Component {
 
     state = {
+        clicked_word:'',
         word:'',
         cardPic:'',
         pcPic:'',
@@ -16,20 +17,22 @@ class Card extends Component {
         pcDeck:[],
         pcCardCurrent:''
         
-    
-        
-
     }
 
     constructor(props){
         super(props);
         this.changeHandler = this.changeHandler.bind(this);
         this.buttonHandler = this.buttonHandler.bind(this);
+        this.handleClick = this.handleClick.bind(this);
         this.deckNumber = this.deckNumber.bind(this)
         this.deckType = this.deckType.bind(this)
         this.shuffle = this.shuffle.bind(this)
         this.reset = this.reset.bind(this)
         this.win = this.win.bind(this)
+    }
+    handleClick(event) {
+        const data = event.target.value 
+        this.setState({clicked_word:data})
     }
 
     changeHandler(event) { //accept the data from input
@@ -137,7 +140,6 @@ class Card extends Component {
         let pcCard = this.state.pcCardCurrent;
 
         let playerCard = this.state.word;
-        let a=parseInt(playerCard.match(pattern));
         if(this.state.playerDeck.includes(playerCard) && this.state.playerDeck.length > 0 && this.state.pcDeck.length > 0 ) {
             if(parseInt(pcCard.match(pattern)) > parseInt(playerCard.match(pattern)))  // also need to check  what to do in case of draw
                 this.setState({pcScore:this.state.pcScore+1}) //there was changes
@@ -158,8 +160,6 @@ class Card extends Component {
                 if(parseInt(pcCard.match(pattern)) < parseInt(playerCard.match(pattern)))
                     this.setState({playerScore:this.state.playerScore+1})
             }
-            // this.state.playerDeck.pop();
-            // this.state.pcDeck.pop();
             delete this.state.playerDeck[this.state.playerDeck.indexOf(playerCard)]
         }
         
@@ -168,20 +168,22 @@ class Card extends Component {
     render() {
         return (
             <div className="Card">
-                <div>
+                <div className='title'>
+                    <div className='score'>
+                        <h2 >score:{this.state.playerScore}</h2>
+                        <h2 >pc score:{this.state.pcScore}</h2>
+                    </div>
                     <Image source={this.state.cardPic} />
                     <Image source={this.state.pcPic} />
+                    <div className='score'>
+                        <input  style={{height:20}} type='text' onChange={(event) => this.changeHandler(event)}  /> 
+                        <button className='button' type='button' onClick={this.buttonHandler}>submit</button>
+                        <button className='sufflebutton' type='button' onClick={this.shuffle}>shuffle</button>
+                    </div>
                 </div>
-                <div>
-                    <h1 style={{marginRight:1500}}>score:{this.state.playerScore}</h1>
-                    <h1 style={{marginRight:1500}}>pc score:{this.state.pcScore}</h1>
-                    <input type='text' onChange={(event) => this.changeHandler(event)}  />
-
-                    <button className='button' type='button' onClick={this.buttonHandler}>submit</button>
-                    <button className='sufflebutton' type='button' onClick={this.shuffle}>shuffle</button>
                 
-                    <Options className='Options' deck ={this.state.playerDeck} />
-                </div>
+                <Options className='Options' deck ={this.state.playerDeck} onClick={(event) => this.handleClick(event)}/>
+
 
             </div>
         );
